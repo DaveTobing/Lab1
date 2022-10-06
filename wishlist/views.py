@@ -1,4 +1,6 @@
+from asyncore import write
 import datetime
+from pyexpat import model
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -10,6 +12,8 @@ from django.http import HttpResponse
 from django.core import serializers
 from django.shortcuts import render
 from wishlist.models import BarangWishlist
+from django.http import JsonResponse
+import json
 
 # Create your views here.
 def show_xml(request):
@@ -38,9 +42,41 @@ def show_wishlist(request):
     return render(request, "wishlist.html", context)
 
 
+def show_wishlist_ajax(request):
+    data_barang_wishlist = BarangWishlist.objects.all()
+    context = {
+    'list_barang': data_barang_wishlist,
+    'nama': 'Dave Matthew Peter Lumban Tobing',
+    'last_login': request.COOKIES['last_login']
+    }
+    return render(request, "wishlist_ajax.html", context)
+
+def ajax_submit(request):
+    fetch_data = json.load(request)
+
+    data_nama = fetch_data['Barang']
+    data_harga = fetch_data['Harga']
+    data_deskripsi = fetch_data['Deskripsi']
+
+    new_wishlist = BarangWishlist.objects.create(nama_barang= data_nama, harga_barang= data_harga, deskripsi= data_deskripsi)
+
+    data = {
+        "model": "wishlist.BarangWishlist",
+        "pk": new_wishlist.id,
+        "fields":{
+            "nama_barang": data_nama,
+            "harga_barang": data_harga,
+            "deskripsi": data_deskripsi
+        }
+    }
+
+    write_json(data)
+    
+    return JsonResponse(data)
+
+
 def register(request):
     form = UserCreationForm()
-
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():

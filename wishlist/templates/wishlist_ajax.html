@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (e) => {
+          const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+          const wishlist_form = document.getElementById('form-barang');
+          const currentURL = window.location.href + "submit";
+
+          wishlist_form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(wishlist_form);
+            
+            const name = formData.get('Barang');
+            const price = formData.get('Harga');
+            const description = formData.get('Deskripsi'); 
+
+            fetch(currentURL, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers:{
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
+                    'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify({'Barang': name, 'Harga': price, 'Deskripsi': description})
+            }).then((response) => {
+                return response.json();
+            }).then((json_data) => {
+                const tableBody = document.getElementById('barang-wishlist');
+                console.log(tableBody)
+                // Insert a row at the end of table
+                var newRow = tableBody.insertRow(-1);
+                // Insert a cell at the end of the row
+                var nama_barang_cell = newRow.insertCell();
+                var harga_barang_cell = newRow.insertCell();
+                var deskripsi_barang_cell = newRow.insertCell();
+                // Append a text node to the cell
+                var nama_barang = document.createTextNode(json_data['fields']['nama_barang']);
+                var harga_barang = document.createTextNode(json_data['fields']['harga_barang']);
+                var deskripsi = document.createTextNode(json_data['fields']['deskripsi']);
+                nama_barang_cell.appendChild(nama_barang);
+                harga_barang_cell.appendChild(harga_barang);
+                deskripsi_barang_cell.appendChild(deskripsi);
+            }).catch((error) => {
+                console.error(error);
+            })
+
+        });
+    });
+    </script>
+</head>
+
+<body class="p-3 mb-2 bg-dark text-white">
+    <nav  class= "navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+          <h5>Nama: {{nama}} </h5>
+          <button type="button" class="btn btn-outline-dark" ><a  href="{% url 'wishlist:logout' %}"> Logout </a> </button>
+        </div>
+    </nav>
+    
+    <form method="POST" action="" class="form-barang">
+      {% csrf_token %}
+          <table class="table table-dark table-striped">
+              <tr>
+                  <td>Barang: </td>
+                  <td><input type="text" name="Barang" placeholder="Barang" class="form-control"></td>
+              </tr>
+              <tr>
+                  <td>Harga Barang: </td>
+                  <td><input type="number" name="Harga" placeholder="Harga" class="form-control"></td>
+              </tr>
+              <tr>
+                <td>Deskripsi: </td>
+                <td><input type="text" name="Deskripsi" placeholder="Deskripsi" class="form-control"></td>
+            </tr>
+              <tr>
+                  <td></td>
+                  <td><input type="submit" value="Submit" class="btn btn-dark" ></td>
+              </tr>
+          </table>
+  </form>
+
+    <div class="container text-center">
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-10">
+              <table  class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                      <th scope="col">Nama barang</th>
+                      <th scope="col">Harga Barang</th>
+                      <th scope="col">Deskripsi</th>
+                    </tr>
+                  </thead>
+                {% comment %} Tambahkan data di bawah baris ini {% endcomment %}
+                {% for barang in list_barang %}
+                    <tr>
+                        <th>{{barang.nama_barang}}</th>
+                        <th>{{barang.harga_barang}}</th>
+                        <th>{{barang.deskripsi}}</th>
+                    </tr>
+                {% endfor %}
+                </table>
+            </div>
+    
+        <h5>Sesi terakhir login: {{ last_login }}</h5>
+    </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+        {% endblock content %}
+    </div>
+</body>
+
+
+
