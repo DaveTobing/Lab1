@@ -12,5 +12,5 @@ urlpatterns = [
     path('login/', login_user, name='login'), #sesuaikan dengan nama fungsi yang dibuat
     path('logout/', logout_user, name='logout'), #sesuaikan dengan nama fungsi yang dibuat
     path('ajax/', show_wishlist_ajax, name='show_wishlist_ajax'),
-    path('ajax/submit/', ajax_submit, name= 'ajax_submit')
+    path('ajax/submit', ajax_submit, name= 'ajax_submit')
 ]

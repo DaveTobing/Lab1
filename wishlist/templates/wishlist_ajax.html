@@ -31,7 +31,7 @@
             }).then((response) => {
                 return response.json();
             }).then((json_data) => {
-                const tableBody = document.getElementById('barang-wishlist');
+                const tableBody = document.getElementById('barang_table');
                 console.log(tableBody)
                 // Insert a row at the end of table
                 var newRow = tableBody.insertRow(-1);
@@ -63,7 +63,7 @@
         </div>
     </nav>
     
-    <form method="POST" action="" class="form-barang">
+    <form method="POST" action="" id="form-barang">
       {% csrf_token %}
           <table class="table table-dark table-striped">
               <tr>
@@ -98,11 +98,13 @@
                   </thead>
                 {% comment %} Tambahkan data di bawah baris ini {% endcomment %}
                 {% for barang in list_barang %}
-                    <tr>
-                        <th>{{barang.nama_barang}}</th>
-                        <th>{{barang.harga_barang}}</th>
-                        <th>{{barang.deskripsi}}</th>
-                    </tr>
+                      <tbody  id="barang_table">
+                        <tr>
+                          <th>{{barang.nama_barang}}</th>
+                          <th>{{barang.harga_barang}}</th>
+                          <th>{{barang.deskripsi}}</th>
+                      </tr>
+                    </tbody>
                 {% endfor %}
                 </table>
             </div>
